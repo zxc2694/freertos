@@ -67,3 +67,11 @@ char *strncpy(char *dest, const char *src, size_t n)
 	while (n-- && (*d++ = *s++));
 	return dest;
 }
+
+
+size_t strlen (const char * str)
+{
+    int count;
+    for(count=0 ; str[count]!='\0';count++);
+    return count;
+} 
