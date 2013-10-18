@@ -1,8 +1,13 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
-#include <string.h>
-#include <stdlib.h>
+#include <stdarg.h>
+
+/* Scheduler includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 #define ALIGN (sizeof(size_t))
 #define ONES ((size_t)-1/UCHAR_MAX)                                                                      
@@ -80,3 +85,15 @@ size_t strlen(const char *s)
 	for (s = (const void *) w; *s; s++);	
 	return (s - a);
 }
+
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+    for ( ; n > 0; s1++, s2++, --n)
+	if (*s1 != *s2)
+	    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
+	else if (*s1 == '\0')
+	    return 0;
+    return 0;
+}
+
+

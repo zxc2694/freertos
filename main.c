@@ -148,8 +148,12 @@ void Shell()
 			}
 		} while (!done);
         fio_write(1, newLine, strlen(newLine));
-        if(curr_char>0);
+        if(curr_char>0){
+		if(!strncmp(str,"hello", 5)) {           
+		fio_write(1, "Hello! how are you?\n\r\0", 20);
+		}
 	}
+    }
 }
 
 
