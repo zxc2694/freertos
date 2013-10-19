@@ -84,14 +84,54 @@ char receive_byte()
 	while (!xQueueReceive(serial_rx_queue, &msg, portMAX_DELAY));
 	return msg;
 }
+
+void ShellTask_Command(char *str)
+{		
+	char tmp[20];
+	char newLine[]="\n\r";
+	char i;
+	if(!strncmp(str,"hello", 5)) {           
+		fio_write(1, "Hello! how are you?", 20);
+		fio_write(1, newLine, strlen(newLine));	
+	}
+	else if(!strncmp(str,"echo", 4)&&(strlen(str)==4)||str[4]==' '){
+		if(strlen(str)==4){
+			fio_write(1,"\0",1);
+		}
+		else {
+			for(i=5;i<strlen(str);i++){
+				tmp[0]=str[i];
+				tmp[1]='\0';
+				fio_write(1,&tmp,1);
+			}
+			fio_write(1, newLine, strlen(newLine));
+		}
+	}
+	else if(!strncmp(str,"ps",2)){
+		char title[]="Name\t\t\b\bState\t\b\b\bPriority\t\bStack\t\bNum";
+		fio_write(1,title,strlen(title));
+		char catch[50];
+		vTaskList(catch);
+		fio_write(1,catch,strlen(catch));
+	}
+	else if(!strncmp(str,"help", 4)) {           
+		fio_write(1, "You can use 4 command in the freeRTOS", 40);	
+		fio_write(1, newLine, strlen(newLine));
+		fio_write(1, "hello , echo , ps , help", 25);
+		fio_write(1, newLine, strlen(newLine));
+	}
+	else{
+		fio_write(1,"Command not found, please input 'help'",40);
+		fio_write(1, newLine, strlen(newLine));
+	}
+}
 void Shell()
 {
 	char str[MAX_SERIAL_STR];
 	char ch;
-	char tmp[20];
 	char pos[] = "zxc2694's RTOS~$ ";
 	char newLine[] = "\n\r";
-	int curr_char, done, i;
+	int curr_char, done;
 	while (1)
     {
         fio_write(1, pos, strlen(pos));
@@ -147,33 +187,8 @@ void Shell()
 		} while (!done);
         fio_write(1, newLine, strlen(newLine));
         if(curr_char>0){
-		/* This is my shell command. */
-		
-		if(!strncmp(str,"hello", 5)) {           
-			fio_write(1, "Hello! how are you?", 20);
-			fio_write(1, newLine, strlen(newLine));
-		}
-		else if(!strncmp(str,"echo", 4)&&(strlen(str)==4)||str[4]==' '){
-			if(strlen(str)==4){
-				fio_write(1,"\0",1);
-			}
-			else {
-				for(i=5;i<strlen(str);i++){
-					tmp[0]=str[i];
-					tmp[1]='\0';
-					fio_write(1,&tmp,1);
-				}
-				fio_write(1, newLine, strlen(newLine));
-			}
-		}
-		else if(!strncmp(str,"ps",2)){
-			char title[]="Name\t\t\b\bState\t\b\b\bPriority\t\bStack\t\bNum";
-			fio_write(1,title,strlen(title));
-			char catch[50];
-			vTaskList(catch);
-			fio_write(1,catch,strlen(catch));
-		}
-
+		/*This is my shell command*/
+		ShellTask_Command(str);
 	}
     }
 }
