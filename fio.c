@@ -227,3 +227,24 @@ int sprintf ( char * str, const char * format, ... )//only support %s (string), 
     va_end(para);
     return strlen(str);
 }
+
+
+void Puts(char *msg)
+{
+	if(!msg)return;
+	fio_write(1,msg,strlen(msg));
+}
+
+void Print(char *msg)
+{
+	if(!msg)return;
+	char newLine[]="\n\r";
+	fio_write(1,msg,strlen(msg));
+	fio_write(1,newLine,strlen(newLine));
+}
+
+void Print_nextLine()
+{
+	char newLine[]="\n\r";
+	fio_write(1,newLine,strlen(newLine));
+}
