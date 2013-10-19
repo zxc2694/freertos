@@ -166,6 +166,14 @@ void Shell()
 				fio_write(1, newLine, strlen(newLine));
 			}
 		}
+		else if(!strncmp(str,"ps",2)){
+			char title[]="Name\t\t\b\bState\t\b\b\bPriority\t\bStack\t\bNum";
+			fio_write(1,title,strlen(title));
+			char catch[50];
+			vTaskList(catch);
+			fio_write(1,catch,strlen(catch));
+		}
+
 	}
     }
 }
