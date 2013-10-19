@@ -88,41 +88,36 @@ char receive_byte()
 void ShellTask_Command(char *str)
 {		
 	char tmp[20];
-	char newLine[]="\n\r";
 	char i;
 	if(!strncmp(str,"hello", 5)) {           
-		fio_write(1, "Hello! how are you?", 20);
-		fio_write(1, newLine, strlen(newLine));	
+		Print("Hello! how are you?");
 	}
 	else if(!strncmp(str,"echo", 4)&&(strlen(str)==4)||str[4]==' '){
 		if(strlen(str)==4){
-			fio_write(1,"\0",1);
+			Print_nextLine();
 		}
 		else {
 			for(i=5;i<strlen(str);i++){
 				tmp[0]=str[i];
 				tmp[1]='\0';
-				fio_write(1,&tmp,1);
+				Puts(&tmp);
 			}
-			fio_write(1, newLine, strlen(newLine));
+			Print_nextLine();
 		}
 	}
 	else if(!strncmp(str,"ps",2)){
 		char title[]="Name\t\t\b\bState\t\b\b\bPriority\t\bStack\t\bNum";
-		fio_write(1,title,strlen(title));
+		Puts(title);
 		char catch[50];
 		vTaskList(catch);
-		fio_write(1,catch,strlen(catch));
+		Print(catch);
 	}
 	else if(!strncmp(str,"help", 4)) {           
-		fio_write(1, "You can use 4 command in the freeRTOS", 40);	
-		fio_write(1, newLine, strlen(newLine));
-		fio_write(1, "hello , echo , ps , help", 25);
-		fio_write(1, newLine, strlen(newLine));
+		Print("You can use 4 command in the freeRTOS");	
+		Print("hello , echo , ps , help");
 	}
 	else{
-		fio_write(1,"Command not found, please input 'help'",40);
-		fio_write(1, newLine, strlen(newLine));
+		Print("Command not found, please input 'help'");
 	}
 }
 void Shell()
