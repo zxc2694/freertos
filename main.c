@@ -88,12 +88,10 @@ void Shell()
 {
 	char str[MAX_SERIAL_STR];
 	char ch;
-
-	int curr_char;
-	int done;
+	char tmp[20];
 	char pos[] = "zxc2694's RTOS~$ ";
 	char newLine[] = "\n\r";
-
+	int curr_char, done, i;
 	while (1)
     {
         fio_write(1, pos, strlen(pos));
@@ -149,8 +147,24 @@ void Shell()
 		} while (!done);
         fio_write(1, newLine, strlen(newLine));
         if(curr_char>0){
+		/* This is my shell command. */
+		
 		if(!strncmp(str,"hello", 5)) {           
-		fio_write(1, "Hello! how are you?\n\r\0", 20);
+			fio_write(1, "Hello! how are you?", 20);
+			fio_write(1, newLine, strlen(newLine));
+		}
+		else if(!strncmp(str,"echo", 4)&&(strlen(str)==4)||str[4]==' '){
+			if(strlen(str)==4){
+				fio_write(1,"\0",1);
+			}
+			else {
+				for(i=5;i<strlen(str);i++){
+					tmp[0]=str[i];
+					tmp[1]='\0';
+					fio_write(1,&tmp,1);
+				}
+				fio_write(1, newLine, strlen(newLine));
+			}
 		}
 	}
     }
