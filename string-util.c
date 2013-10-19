@@ -96,4 +96,43 @@ int strncmp(const char *s1, const char *s2, size_t n)
     return 0;
 }
 
+char * strcat ( char * destination, const char * source )
+{
+    int dLength = strlen(destination);
+    int sLength = strlen(source);
+    int i;
+    for (i = 0; i<sLength; i++)
+    {
+        destination[i+dLength]=source[i];
+    }
+    destination[dLength+sLength]='\0';
+    return destination;
+}
+
+/*Ref andy79923*/
+/*Support the sprintf*/
+char* itoa(int value, char* str)
+{
+    int base = 10;
+    int divideNum = base;
+    int i=0;
+    while(value/divideNum > 0)
+    {
+        divideNum*=base;
+    }
+    if(value < 0)
+    {
+        str[0] = '-';
+        i++;
+    }
+    while(divideNum/base > 0)
+    {
+        divideNum/=base;
+        str[i++]=value/divideNum+48;
+        value%=divideNum;
+    }
+    str[i]='\0';
+    return str;
+
+}
 
