@@ -140,7 +140,7 @@ void ShellTask_Command(char *str)
 	}
 	else if(!strncmp(str,"host",4)){
 		//Host_command(str);
-char host_cmd[32];
+		char host_cmd[32];
 		host_system(host_cmd, strlen(host_cmd));
 	}
 	else{
