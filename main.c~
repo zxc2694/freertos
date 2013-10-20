@@ -85,7 +85,7 @@ char receive_byte()
 	while (!xQueueReceive(serial_rx_queue, &msg, portMAX_DELAY));
 	return msg;
 }
-/*
+
 void Host_command(char *str[])
 {
 	if(strlen(str)==4){
@@ -106,7 +106,7 @@ void Host_command(char *str[])
 		Print("Transmit the command to semihost.");
 	}
 }
-*/
+
 void ShellTask_Command(char *str)
 {		
 	char tmp[20];
@@ -140,7 +140,6 @@ void ShellTask_Command(char *str)
 	}
 	else if(!strncmp(str,"host",4)){
 		//Host_command(str);
-char host_cmd[32];
 		host_system(host_cmd, strlen(host_cmd));
 	}
 	else{
