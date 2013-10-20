@@ -85,28 +85,26 @@ char receive_byte()
 	while (!xQueueReceive(serial_rx_queue, &msg, portMAX_DELAY));
 	return msg;
 }
-/*
-void Host_command(char *str[])
+
+void Host_command(char *str)
 {
+	char host_tmp[strlen(str)];
+	char i=0;
 	if(strlen(str)==4){
 		Print("Please input: host <command>");
 	}
+	else if(!strncmp(str,"host ", 5)){
+		for(i=5;i<strlen(str);i++){
+				host_tmp[i-5]=str[i];
+			}
+			host_system(host_tmp, strlen(host_tmp));
+			Print("OK! it have transmitted the command to semihost.");
+	}
 	else{
-		int len=strlen(str[1]);
-		int rnt;
-		if(str[1][0]=='\''){
-			str[1][len-1]='\0';
-			rnt=host_system(str[1]+1);
-		Print("WHY");
-		}
-		else {
-			rnt=host_system(str[1]);
-			Print("WHY2");
-		}
-		Print("Transmit the command to semihost.");
+		Print("Error!");
 	}
 }
-*/
+
 void ShellTask_Command(char *str)
 {		
 	char tmp[20];
@@ -114,17 +112,15 @@ void ShellTask_Command(char *str)
 	if(!strncmp(str,"hello", 5)) {           
 		Print("Hello! how are you?");
 	}
-	else if(!strncmp(str,"echo", 4)&&(strlen(str)==4)||str[4]==' '){
+	else if(!strncmp(str,"echo", 4)){
 		if(strlen(str)==4){
 			Print_nextLine();
 		}
-		else {
+		if(str[4]==' '){
 			for(i=5;i<strlen(str);i++){
-				tmp[0]=str[i];
-				tmp[1]='\0';
-				Puts(&tmp);
+				tmp[i-5]=str[i];
 			}
-			Print_nextLine();
+			Print(tmp);
 		}
 	}
 	else if(!strncmp(str,"ps",2)){
@@ -135,13 +131,11 @@ void ShellTask_Command(char *str)
 		Print(catch);
 	}
 	else if(!strncmp(str,"help", 4)) {           
-		Print("You can use 4 command in the freeRTOS");	
-		Print("hello , echo , ps , help");
+		Print("You can use 5 command in the freeRTOS");	
+		Print("hello , echo , ps , help , host ");
 	}
 	else if(!strncmp(str,"host",4)){
-		//Host_command(str);
-		char host_cmd[32];
-		host_system(host_cmd, strlen(host_cmd));
+		Host_command(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");
@@ -166,9 +160,6 @@ void Shell()
 			 * block). */
             ch=receive_byte();
 
-			/* If the byte is an end-of-line type character, then
-			 * finish the string and inidcate we are done.
-			 */
 			if (curr_char >= MAX_SERIAL_STR-1 || (ch == '\r') || (ch == '\n'))
             {
 				str[curr_char] = '\0';
