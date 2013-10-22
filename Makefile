@@ -101,6 +101,12 @@ qemudbg: main.bin $(QEMU_STM32)
 		-gdb tcp::3333 -S \
 		-kernel main.bin -semihosting
 		
+gdbauto: main.bin
+	$(QEMU_STM32) -M stm32-p103 \
+		-gdb tcp::3333 -S \
+		-kernel main.bin  &
+	$(CROSS_COMPILE)gdb -x gdb.in 
+
 qemuauto: main.bin $(QEMU_STM32)
 	bash emulate.sh main.bin -semihosting
 
