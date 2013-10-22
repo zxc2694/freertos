@@ -14,6 +14,7 @@
 #include "host.h"
 
 #define MAX_SERIAL_STR 100
+#define Command_Number 5
 extern const char _sromfs;
 
 static void setup_hardware();
@@ -98,7 +99,7 @@ void Host_command(char *str)
 				host_tmp[i-5]=str[i];
 			}
 			host_system(host_tmp, strlen(host_tmp));
-			Print("OK! it have transmitted the command to semihost.");
+			Print("OK! You have transmitted the command to semihost.");
 	}
 	else{
 		Print("Error!");
@@ -109,6 +110,7 @@ void ShellTask_Command(char *str)
 {		
 	char tmp[20];
 	char i;
+	char c[40];
 	if(!strncmp(str,"hello", 5)) {           
 		Print("Hello! how are you?");
 	}
@@ -131,7 +133,8 @@ void ShellTask_Command(char *str)
 		Print(catch);
 	}
 	else if(!strncmp(str,"help", 4)) {           
-		Print("You can use 5 command in the freeRTOS");	
+		sprintf(c,"You can use %d command in the freeRTOS",Command_Number);
+		Print(c);
 		Print("hello , echo , ps , help , host ");
 	}
 	else if(!strncmp(str,"host",4)){
