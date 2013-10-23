@@ -15,11 +15,12 @@
 #include "host.h"
 
 #define MAX_SERIAL_STR 100
-#define Command_Number 5
+#define Command_Number 6
+
+char MyShell_Command[]="hello , echo , ps , help , host , cat";
+
 extern const char _sromfs;
-
 static void setup_hardware();
-
 volatile xSemaphoreHandle serial_tx_wait_sem = NULL;
 volatile xQueueHandle serial_rx_queue = NULL;
 
@@ -88,6 +89,40 @@ char receive_byte()
 	return msg;
 }
 
+void Cat_command(char *str)
+{
+    char i;
+    char c[20];
+    char path[20]="/romfs/";
+    char buff[100],tmp[7];
+    buff[0]='\0';
+    int count;
+    if(strlen(str)==3){
+		Print("Please input: cat <file> (EX:cat test.txt)");
+	}
+	else if(!strncmp(str,"cat ", 4)){
+		for(i=4;i<strlen(str);i++){
+				tmp[i-4]=str[i];
+			}			
+			strcat(path,tmp);
+    		        int fd = fs_open(path, 0, O_RDONLY);
+			if(fd<0){
+      			        Print("No such this file.");
+       			 }
+       			 else{
+          		        count = fio_read(fd, buff, sizeof(buff));
+				char buff2[count-1];
+				for(i=0;i<count-1;i++)
+				buff2[i]=buff[i];
+				Print(buff2);
+ 			} 
+	}
+	else{
+		Print("Error!");
+	}
+
+}
+ 
 void Host_command(char *str)
 {
 	char host_tmp[strlen(str)];
@@ -136,10 +171,13 @@ void ShellTask_Command(char *str)
 	else if(!strncmp(str,"help", 4)) {           
 		sprintf(c,"You can use %d command in the freeRTOS",Command_Number);
 		Print(c);
-		Print("hello , echo , ps , help , host ");
+		Print(MyShell_Command);
 	}
 	else if(!strncmp(str,"host",4)){
 		Host_command(str);
+	}
+	else if(!strncmp(str,"cat",3)){
+		Cat_command(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");
@@ -219,7 +257,7 @@ int main()
 	
 	fs_init();
 	fio_init();
-	
+	register_romfs("romfs", &_sromfs);
 	/* Create the queue used by the serial task.  Messages for write to
 	 * the RS232. */
 	vSemaphoreCreateBinary(serial_tx_wait_sem);
