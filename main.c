@@ -17,7 +17,35 @@
 #define MAX_SERIAL_STR 100
 #define Command_Number 6
 
-char MyShell_Command[]="hello , echo , ps , help , host , cat";
+enum ALLcommand 
+{
+/*Add your command in here. */
+    hello,
+    echo,
+    ps,
+    help,
+    host,
+    cat,
+};
+
+struct STcommand
+{
+	char *name;
+	int  size; 	
+	char *info;
+};
+typedef struct STcommand CmdList;
+CmdList CMD[]={
+	   /*Add your command list in here. */
+
+	[hello]={.name="hello", .size=5 , .info="Show 'Hello! how are you?'"},
+	[echo] ={.name="echo" , .size=4 , .info="Show your input"},
+	[ps]   ={.name="ps"   , .size=2 , .info="Report current processes"},
+	[help] ={.name="help" , .size=4 , .info="Show command list."},
+	[host] ={.name="host" , .size=4 , .info="Transmit command to host."},
+	[cat]  ={.name="cat"  , .size=3 , .info="Show on the stdout"}
+};	
+
 
 extern const char _sromfs;
 static void setup_hardware();
@@ -89,7 +117,7 @@ char receive_byte()
 	return msg;
 }
 
-void Cat_command(char *str)
+void cat_command(char *str)
 {
     char i;
     char c[20];
@@ -97,12 +125,12 @@ void Cat_command(char *str)
     char buff[100],tmp[7];
     buff[0]='\0';
     int count;
-    if(strlen(str)==3){
+    if(strlen(str)==CMD[cat].size){
 		Print("Please input: cat <file> (EX:cat test.txt)");
 	}
-	else if(!strncmp(str,"cat ", 4)){
-		for(i=4;i<strlen(str);i++){
-				tmp[i-4]=str[i];
+	else if(str[CMD[cat].size]==' '){
+		for(i=CMD[cat].size+1 ; i<strlen(str) ; i++){
+				tmp[i- (CMD[cat].size+1) ]=str[i];
 			}			
 			strcat(path,tmp);
     		        int fd = fs_open(path, 0, O_RDONLY);
@@ -123,16 +151,16 @@ void Cat_command(char *str)
 
 }
  
-void Host_command(char *str)
+void host_command(char *str)
 {
 	char host_tmp[strlen(str)];
 	char i=0;
-	if(strlen(str)==4){
+	if(strlen(str)==CMD[host].size){
 		Print("Please input: host <command>");
 	}
-	else if(!strncmp(str,"host ", 5)){
-		for(i=5;i<strlen(str);i++){
-				host_tmp[i-5]=str[i];
+	else if(str[CMD[host].size]==' '){
+		for(i=CMD[host].size+1;i<strlen(str);i++){
+				host_tmp[i- (CMD[host].size+1) ]=str[i];
 			}
 			host_system(host_tmp, strlen(host_tmp));
 			Print("OK! You have transmitted the command to semihost.");
@@ -171,13 +199,19 @@ void ShellTask_Command(char *str)
 	else if(!strncmp(str,"help", 4)) {           
 		sprintf(c,"You can use %d command in the freeRTOS",Command_Number);
 		Print(c);
-		Print(MyShell_Command);
+		Print_nextLine();
+		for(i=0;i<Command_Number;i++){
+		Puts(CMD[i].name);
+		Puts("\t-- ");
+		Puts(CMD[i].info);
+		Print_nextLine();
+		}
 	}
 	else if(!strncmp(str,"host",4)){
-		Host_command(str);
+		host_command(str);
 	}
 	else if(!strncmp(str,"cat",3)){
-		Cat_command(str);
+		cat_command(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");

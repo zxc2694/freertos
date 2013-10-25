@@ -30,7 +30,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
     struct dirent * ent;
     DIR * rec_dirp;
     uint32_t cur_hash = hash_djb2((const uint8_t *) curpath, hash_init);
-    uint32_t size, w, hash;
+    uint32_t size, w, hash, fileNameLength, headerLength;
     uint8_t b;
     FILE * infile;
 
@@ -54,6 +54,8 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
+            fileNameLength = strlen(ent->d_name);
+            headerLength = fileNameLength + fileNameLength%4;
             infile = fopen(fullpath, "rb");
             if (!infile) {
                 perror("opening input file");
@@ -63,6 +65,19 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             b = (hash >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (hash >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (hash >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+
+            b = (headerLength >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (headerLength >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (headerLength >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (headerLength >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+
+            fwrite(ent->d_name, 1, fileNameLength, outfile);
+            b=0;
+            while(headerLength-- > fileNameLength)
+            {
+                fwrite(&b, 1, 1, outfile);
+            }
+
             fseek(infile, 0, SEEK_END);
             size = ftell(infile);
             fseek(infile, 0, SEEK_SET);
@@ -129,6 +144,6 @@ int main(int argc, char ** argv) {
     if (outname)
         fclose(outfile);
     closedir(dirp);
-    
+
     return 0;
 }
