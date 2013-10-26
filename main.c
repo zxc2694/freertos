@@ -15,7 +15,7 @@
 #include "host.h"
 
 #define MAX_SERIAL_STR 100
-#define Command_Number 6
+#define Command_Number 7
 
 enum ALLcommand 
 {
@@ -26,6 +26,7 @@ enum ALLcommand
     help,
     host,
     cat,
+    ls,
 };
 
 struct STcommand
@@ -43,7 +44,8 @@ CmdList CMD[]={
 	[ps]   ={.name="ps"   , .size=2 , .info="Report current processes"},
 	[help] ={.name="help" , .size=4 , .info="Show command list."},
 	[host] ={.name="host" , .size=4 , .info="Transmit command to host."},
-	[cat]  ={.name="cat"  , .size=3 , .info="Show on the stdout"}
+	[cat]  ={.name="cat"  , .size=3 , .info="Show on the stdout"},
+	[ls]   ={.name="ls"   , .size=2 , .info="Show directory under"},
 };	
 
 
@@ -150,7 +152,16 @@ void cat_command(char *str)
 	}
 
 }
- 
+
+void ls_command(char *str)
+{
+    char ls_buff[128];
+    int fileNum;
+    ls_buff[0]='\0';
+    fileNum=getAllFileName("/romfs/",ls_buff);
+    Print(ls_buff);
+}
+
 void host_command(char *str)
 {
 	char host_tmp[strlen(str)];
@@ -212,6 +223,9 @@ void ShellTask_Command(char *str)
 	}
 	else if(!strncmp(str,"cat",3)){
 		cat_command(str);
+	}
+	else if(!strncmp(str,"ls",2)){
+		ls_command(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");
