@@ -44,6 +44,7 @@ main.bin: test-romfs.o main.c host.c
 		$(FREERTOS_SRC)/portable/MemMang/heap_1.c \
 		\
 		stm32_p103.c \
+		io_set_serial.c \
 		\
 		romfs.c \
 		hash-djb2.c \
@@ -63,6 +64,7 @@ main.bin: test-romfs.o main.c host.c
 		stm32f10x_gpio.o \
 		stm32f10x_usart.o \
 		stm32f10x_exti.o \
+		io_set_serial.o \
 		misc.o \
 		\
 		croutine.o list.o queue.o tasks.o \
