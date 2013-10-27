@@ -228,6 +228,50 @@ int sprintf ( char * str, const char * format, ... )//only support %s (string), 
     return strlen(str);
 }
 
+int printf ( const char * format, ... )
+{
+    char str[128];
+    va_list para;
+    va_start(para,format);
+    int curr_pos=0;
+    char ch[]={'0','\0'};
+    char integer[11];
+    str[0]='\0';
+    while(format[curr_pos]!='\0')
+    {
+        if(format[curr_pos]!='%')
+        {
+            ch[0]=format[curr_pos];
+            strcat(str,ch);
+        }
+        else
+        {
+            switch(format[++curr_pos])
+            {
+                case 's':
+                    strcat(str,va_arg(para,char*));
+                    break;
+                case 'c':
+                    ch[0]=(char)va_arg(para,int);
+                    strcat(str,ch);
+                    break;
+                case 'i':
+                case 'd':
+                    strcat(str,itoa(va_arg(para,int),integer));
+                    break;
+                case 'u':
+                    strcat(str,itoa(va_arg(para,unsigned),integer));
+                    break;
+                default:
+                    break;
+            }
+        }
+        curr_pos++;
+    }
+    va_end(para);
+    return fio_write(1,str,strlen(str));
+}
+
 
 void Puts(char *msg)
 {
