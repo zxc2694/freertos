@@ -52,6 +52,28 @@ CmdList CMD[]={
 
 
 
+void mmtest_command(char *str)
+{
+	char set=1;
+	char mm_str[MAX_SERIAL_STR];	
+	Print("You will run & free allocated memory... [Y / N]?");
+	Print_nextLine();
+	Print("(ps) Input [Ctrl+c] to leave cycle when you select [Y].");	
+	while(set){
+		set=0;
+		Read_Input(mm_str,MAX_SERIAL_STR);
+		if(!strncmp(mm_str,"Y", 1) || !strncmp(mm_str,"y", 1)){
+			mmtest_fio_function(str);
+		}
+		else if(!strncmp(mm_str,"N", 1) || !strncmp(mm_str,"n", 1)){
+			Print("Leave mmtest!");
+		}
+		else{
+			set=1;
+			Print("Please input 'Y' & 'N'....");
+		}
+	}
+}
 
 void cat_command(char *str)
 {
@@ -162,7 +184,7 @@ void ShellTask_Command(char *str)
 		ls_command(str);
 	}
 	else if(!strncmp(str,"mmtest",6)){
-		mmtest_fio_function(str);
+		mmtest_command(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");
@@ -171,65 +193,14 @@ void ShellTask_Command(char *str)
 void Shell()
 {
 	char str[MAX_SERIAL_STR];
-	char ch;
 	char pos[] = "zxc2694's RTOS~$ ";
 	char newLine[] = "\n\r";
-	int curr_char, done;
 	while (1)
     {
         fio_write(1, pos, strlen(pos));
-		curr_char = 0;
-		done = 0;
-		str[curr_char] = '\0';
-		do
-        {
-			/* Receive a byte from the RS232 port (this call will
-			 * block). */
-            ch=receive_byte();
-
-			if (curr_char >= MAX_SERIAL_STR-1 || (ch == '\r') || (ch == '\n'))
-            {
-				str[curr_char] = '\0';
-				done = -1;
-				/* Otherwise, add the character to the
-				 * response string. */
-			}
-			else if(ch == 127)//press the backspace key
-            {
-                if(curr_char!=0)
-                {
-                    curr_char--;
-                    fio_write(1,"\b \b", 3);
-                }
-            }
-            else if(ch == 27)//press up, down, left, right, home, page up, delete, end, page down
-            {
-                ch=receive_byte();
-                if(ch != '[')
-                {
-                    str[curr_char++] = ch;
-                    fio_write(1, &ch, 1);
-                }
-                else
-                {
-                    ch=receive_byte();
-                    if(ch >= '1' && ch <= '6')
-                    {
-                        ch=receive_byte();
-                    }
-                }
-            }
-			else
-            {
-				str[curr_char++] = ch;
-				fio_write(1, &ch, 1);
-			}
-		} while (!done);
-        fio_write(1, newLine, strlen(newLine));
-        if(curr_char>0){
-		/*This is my shell command*/
-		ShellTask_Command(str);
-	}
+	Read_Input(str,MAX_SERIAL_STR);
+	/*This is my shell command*/
+	ShellTask_Command(str);
     }
 }
 
