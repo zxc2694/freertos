@@ -413,3 +413,50 @@ void mmtest_fio_function(char *str)
         vPortFree(p);
     }while(read_pointer!=write_pointer);
 }
+
+
+void Read_Input(char *str,int MAX_SERIAL_STR)
+{
+	char ch;
+	char newLine[] = "\n\r";
+	int curr_char, done;
+	curr_char = 0;
+	done = 0;
+	str[curr_char] = '\0';
+	do{
+		/* Receive a byte from the RS232 port (this call will block). */
+         	ch=receive_byte();
+
+		if (curr_char >= MAX_SERIAL_STR-1 || (ch == '\r') || (ch == '\n')){
+			str[curr_char] = '\0';
+			done = -1;
+			/* Otherwise, add the character to the response string. */
+		}
+		else if(ch == 127){ //press the backspace key
+                	if(curr_char!=0){
+                    		curr_char--;
+                    		fio_write(1,"\b \b", 3);
+              		}
+            	}
+            	else if(ch == 27){  //press up, down, left, right, home, page up, delete, end, page down
+                	ch=receive_byte();
+                	if(ch != '['){
+                    		str[curr_char++] = ch;
+                    		fio_write(1, &ch, 1);
+                	}
+                	else{
+                    		ch=receive_byte();
+                   		 if(ch >= '1' && ch <= '6'){
+                        		ch=receive_byte();
+                    		}
+                	}
+            	}
+		else{
+			str[curr_char++] = ch;
+			fio_write(1, &ch, 1);
+		}
+	} while (!done);
+
+        Print_nextLine();
+	return str;
+}
