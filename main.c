@@ -15,7 +15,7 @@
 #include "host.h"
 
 #define MAX_SERIAL_STR 100
-#define Command_Number 7
+#define Command_Number 8
 
 enum ALLcommand 
 {
@@ -27,6 +27,7 @@ enum ALLcommand
     host,
     cat,
     ls,
+    mmtest,
 };
 
 struct STcommand
@@ -39,13 +40,14 @@ typedef struct STcommand CmdList;
 CmdList CMD[]={
 	   /*Add your command list in here. */
 
-	[hello]={.name="hello", .size=5 , .info="Show 'Hello! how are you?'"},
-	[echo] ={.name="echo" , .size=4 , .info="Show your input"},
-	[ps]   ={.name="ps"   , .size=2 , .info="Report current processes"},
-	[help] ={.name="help" , .size=4 , .info="Show command list."},
-	[host] ={.name="host" , .size=4 , .info="Transmit command to host."},
-	[cat]  ={.name="cat"  , .size=3 , .info="Show on the stdout"},
-	[ls]   ={.name="ls"   , .size=2 , .info="Show directory under"},
+      [hello]   = {.name="hello"   , .size=5 , .info="Show 'Hello! how are you?'"},
+      [echo]    = {.name="echo"    , .size=4 , .info="Show your input"},
+      [ps]      = {.name="ps"      , .size=2 , .info="Report current processes"},
+      [help]    = {.name="help"    , .size=4 , .info="Show command list."},
+      [host]    = {.name="host"    , .size=4 , .info="Transmit command to host."},
+      [cat]     = {.name="cat"     , .size=3 , .info="Show on the stdout"},
+      [ls]      = {.name="ls"      , .size=2 , .info="Show directory under"},
+      [mmtest]  = {.name="mmtest"  , .size=6 , .info="Report Memory Management test"},
 };	
 
 
@@ -158,6 +160,9 @@ void ShellTask_Command(char *str)
 	}
 	else if(!strncmp(str,"ls",2)){
 		ls_command(str);
+	}
+	else if(!strncmp(str,"mmtest",6)){
+		mmtest_fio_function(str);
 	}
 	else{
 		Print("Command not found, please input 'help'");
